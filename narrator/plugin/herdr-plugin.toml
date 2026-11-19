@@ -2,7 +2,7 @@ id = "narrator"
 name = "Narrator"
 version = "0.1.0"
 min_herdr_version = "0.9.5"
-description = "Starts the Narrator's Narrator hidden at startup; replay, mute, quit and start actions"
+description = "Starts the Narrator hidden at startup; replay, mute, quit and start actions"
 platforms = ["macos", "linux"]
 
 # Herdr qualifies action ids as <plugin id>.<action id>: narrator.replay, narrator.mute, narrator.quit and narrator.start.

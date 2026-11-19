@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// The Narrator's Narrator: speak a pane's Summary (or a tab's Rollup) when focus settles, keep Summaries fresh in the
+// The Narrator: speak a pane's Summary (or a tab's Rollup) when focus settles, keep Summaries fresh in the
 // background, and speak up when an unfocused agent is blocked.
 //
 // Focus path: on every focus event we cancel the line that is playing, find what to say and start rendering it
