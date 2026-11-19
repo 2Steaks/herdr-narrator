@@ -1,0 +1,48 @@
+id = "narrator"
+name = "Narrator"
+version = "0.1.0"
+min_herdr_version = "0.9.5"
+description = "Starts the Narrator's Narrator hidden at startup; replay, mute, quit and start actions"
+platforms = ["macos", "linux"]
+
+# Herdr qualifies action ids as <plugin id>.<action id>: narrator.replay, narrator.mute, narrator.quit and narrator.start.
+# Each action runs plugin/send.sh, which sends one line to ~/.narrator/narrator.sock and exits 0.
+
+[[actions]]
+id = "replay"
+title = "Narrator: replay the last line"
+description = "Speak the Narrator's last line again, or the focused pane's cached Summary if it has said nothing yet"
+contexts = ["global"]
+command = ["sh", "send.sh", "replay"]
+
+[[actions]]
+id = "mute"
+title = "Narrator: toggle mute"
+description = "Toggle NARRATOR_MUTED in ~/.narrator/state.json and confirm with a chime"
+contexts = ["global"]
+command = ["sh", "send.sh", "mute"]
+
+[[actions]]
+id = "quit"
+title = "Narrator: quit"
+description = "Shut the hidden Narrator down cleanly (stops the sidecar, removes ~/.narrator/narrator.sock)"
+contexts = ["global"]
+command = ["sh", "send.sh", "quit"]
+
+[[actions]]
+id = "start"
+title = "Narrator: start"
+description = "Launch the hidden Narrator if it is not running (reads ~/.narrator/config.env; does nothing while it runs)"
+contexts = ["global"]
+command = ["sh", "start.sh"]
+
+# Not used at startup: start.sh launches the Narrator as a hidden background process. This pane is for debugging, to watch
+# its log live: `herdr plugin pane open --plugin narrator --entrypoint narrator --placement tab`. Send narrator.quit first.
+[[panes]]
+id = "narrator"
+title = "Narrator"
+placement = "tab"
+command = ["bash", "run-narrator.sh"]
+
+[[startup]]
+command = ["sh", "start.sh"]
