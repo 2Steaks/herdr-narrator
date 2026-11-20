@@ -11,6 +11,7 @@ const ACTIONS = [
   { key: "m", label: "Toggle mute", script: "send.sh", args: ["mute"] },
   { key: "s", label: "Start the Narrator", script: "start.sh", args: [] },
   { key: "q", label: "Quit the Narrator", script: "send.sh", args: ["quit"] },
+  { key: "x", label: "Restart the Narrator", script: "../restart.sh", args: [] },
 ];
 
 export default class NarratorMod extends View {

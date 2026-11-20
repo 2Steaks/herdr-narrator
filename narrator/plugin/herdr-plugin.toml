@@ -36,6 +36,13 @@ description = "Launch the hidden Narrator if it is not running (reads ~/.narrato
 contexts = ["global"]
 command = ["sh", "start.sh"]
 
+[[actions]]
+id = "restart"
+title = "Narrator: restart"
+description = "Stop the Narrator completely (leftover sidecar and stale socket included) and start it again; picks up config.env changes"
+contexts = ["global"]
+command = ["sh", "../restart.sh"]
+
 # Not used at startup: start.sh launches the Narrator as a hidden background process. This pane is for debugging, to watch
 # its log live: `herdr plugin pane open --plugin narrator --entrypoint narrator --placement tab`. Send narrator.quit first.
 [[panes]]

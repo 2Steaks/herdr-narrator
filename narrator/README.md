@@ -89,7 +89,8 @@ Settings live in `~/.narrator/config.env` (`KEY=value` lines, read at launch; va
 | `NARRATOR_USER_NAME` | "the user" | The name the summaries use for you |
 | `NARRATOR_TTS` | `kokoro` | Voice engine: `kokoro` or `qwen` |
 | `NARRATOR_VOICE` | `af_heart` | Kokoro voice id (ids starting with `b` use British English) |
-| `NARRATOR_QWEN_VOICE`, `NARRATOR_QWEN_MODEL` | `ryan`, the 0.6B CustomVoice 8-bit | Qwen speaker and model |
+| `NARRATOR_QWEN_VOICE`, `NARRATOR_QWEN_MODEL` | `ryan`, the 0.6B CustomVoice 8-bit (0.6B Base 8-bit for a cloned voice) | Qwen speaker or cloned voice name, and model |
+| `NARRATOR_QWEN_VOICES_DIR` | `~/.narrator/voices` | Where cloned voices live (see Custom voices) |
 | `NARRATOR_BACKEND` | Herdr socket | `herdr-app` to watch the Herdr app instead |
 | `NARRATOR_DEBOUNCE_MS` | `400` | How still focus must be before it speaks |
 | `NARRATOR_AUTOSTART` | on | `0` stops the Stop hook from starting it |
@@ -108,6 +109,16 @@ If a login or key stops working (HTTP 401 or 403), the Narrator says so once and
 
 Kokoro is the default: small, fast, and good. Qwen3-TTS (`--qwen`) sounds more natural but renders a full sentence in roughly twice the time, which only matters for lines that cannot be rendered ahead of time. Qwen presets: serena, vivian, uncle_fu, ryan, aiden, ono_anna, sohee, eric, dylan. The Narrator follows your default output device, so switching to headphones mid-session works from the next line.
 
+#### Custom voices
+
+Qwen3-TTS can clone a voice from a short recording. Record 5 to 10 seconds of one person talking, no music, and write down exactly what they say. Then:
+
+```sh
+sh narrator/add-voice.sh ben ~/Desktop/ben.m4a "The exact words in the recording." --use
+```
+
+That converts the clip to 24 kHz mono, stores it in `~/.narrator/voices/ben/` (`reference.wav` and `transcript.txt`), renders one line to check it works, and with `--use` sets `NARRATOR_TTS=qwen` and `NARRATOR_QWEN_VOICE=ben` in `~/.narrator/config.env`. Restart the Narrator afterwards. The first run downloads the Qwen3-TTS Base model. Any folder in `~/.narrator/voices/` can be selected by name with `NARRATOR_QWEN_VOICE`; a name with no folder is a preset. Cloned voices use the 0.6B Base model; `NARRATOR_QWEN_MODEL` overrides it (cloning only works on Base models). Running the script again for the same name replaces the voice and keeps the old one as `<name>.bak-before-narrator`.
+
 ## Using it
 
 | Action | Effect |
@@ -115,6 +126,7 @@ Kokoro is the default: small, fast, and good. Qwen3-TTS (`--qwen`) sounds more n
 | `narrator.replay` | Say the last line again, or the focused pane's summary if nothing has been said yet |
 | `narrator.mute` | Toggle mute, with a chime |
 | `narrator.start` / `narrator.quit` | Start it, or shut it down cleanly |
+| `narrator.restart` | Stop it completely and start it again (runs `restart.sh`; not bound to a key by the installer). Also on `x` in the app overlay |
 
 Run them from the keys the installer added (`prefix+a`, `prefix+m`, `prefix+u`, `prefix+y`), from the app overlay, or with `herdr plugin action invoke narrator.replay`.
 
@@ -123,6 +135,8 @@ Run them from the keys the installer added (`prefix+a`, `prefix+m`, `prefix+u`, 
 The text of an agent's latest reply is sent to the summary provider you choose. With Ollama it stays on your machine. The Narrator never writes reply text or summaries to its log. Its settings file can hold an API key, so it is created readable by you only.
 
 ## Troubleshooting
+
+Start with `sh narrator/doctor.sh`. It checks the process and voice sidecar, whether the socket answers and the Narrator reads it (the cause of most dead controls), mute, the voice, the Herdr app, the overlay and hooks, and the last 15 minutes of the log (`--minutes N` to change that). It prints counts and error names only, and ends with what to do about each problem. Then `sh narrator/restart.sh` stops everything cleanly (quit command, then signals, then leftover sidecars and a stale socket) and starts it the way Herdr does; `--dry-run` shows what it would do. Run it from a Herdr pane unless `NARRATOR_BACKEND=herdr-app` is set.
 
 - **Nothing is said.** Read `~/.narrator/narrator.log`. Look for `summary provider` at startup (a missing key is reported there) and `summary failed` lines.
 - **It is not running.** `sh narrator/plugin/start.sh`. It does nothing when it is already running.
