@@ -20,7 +20,8 @@ The overlay shows whether the Narrator is muted or speaking, and one key does th
 | `m` | Toggle mute |
 | `s` | Start the Narrator |
 | `q` | Quit the Narrator |
-| `x` | Restart the Narrator (stops it completely, then starts it; picks up `config.env` changes) |
+| `x` | Restart the Narrator (stops it completely, then starts it; picks up `config.env` changes). A toast says how it went |
+| `d` | Diagnose problems (runs `doctor.sh`). A toast gives the verdict and what to do; the full report is in `~/.narrator/doctor.txt` |
 
 ## Starting at login
 

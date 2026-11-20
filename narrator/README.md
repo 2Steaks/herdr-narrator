@@ -126,7 +126,7 @@ That converts the clip to 24 kHz mono, stores it in `~/.narrator/voices/ben/` (`
 | `narrator.replay` | Say the last line again, or the focused pane's summary if nothing has been said yet |
 | `narrator.mute` | Toggle mute, with a chime |
 | `narrator.start` / `narrator.quit` | Start it, or shut it down cleanly |
-| `narrator.restart` | Stop it completely and start it again (runs `restart.sh`; not bound to a key by the installer). Also on `x` in the app overlay |
+| `narrator.restart` | Stop it completely and start it again (runs `restart.sh`; not bound to a key by the installer). Also on `x` in the app overlay, where `d` runs `doctor.sh` and shows the result as a toast |
 
 Run them from the keys the installer added (`prefix+a`, `prefix+m`, `prefix+u`, `prefix+y`), from the app overlay, or with `herdr plugin action invoke narrator.replay`.
 
