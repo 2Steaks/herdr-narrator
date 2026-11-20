@@ -18,6 +18,8 @@ Run with ~/narrator-voice/.venv/bin/python. NARRATOR_SIDECAR_SILENT=1 skips the 
 NARRATOR_VOICE picks the Kokoro voice (default af_heart); b* voices switch to en-gb.
 NARRATOR_TTS=qwen swaps Kokoro for Qwen3-TTS through mlx-audio (Apple Silicon only; full-sentence renders, not streamed).
 NARRATOR_QWEN_VOICE picks its speaker (default ryan), NARRATOR_QWEN_MODEL the mlx-community repo (default the 0.6B CustomVoice 8-bit).
+A folder named after the speaker in NARRATOR_QWEN_VOICES_DIR (default ~/.narrator/voices) is a cloned voice (reference.wav and
+transcript.txt, see qwen_voice.py); it switches the default model to the 0.6B Base 8-bit.
 The audio cache is keyed by `key`, LRU, capped at CACHE_MAX_BYTES. Text is never logged.
 """
 import json
@@ -35,7 +37,8 @@ VOICE = os.environ.get("NARRATOR_VOICE", "af_heart")
 LANG = "en-gb" if VOICE.startswith("b") else "en-us"  # Kokoro ids start with accent (a/b), then gender (f/m)
 TTS = os.environ.get("NARRATOR_TTS", "kokoro")
 QWEN_VOICE = os.environ.get("NARRATOR_QWEN_VOICE", "ryan")
-QWEN_MODEL = os.environ.get("NARRATOR_QWEN_MODEL", "mlx-community/Qwen3-TTS-12Hz-0.6B-CustomVoice-8bit")
+QWEN_MODEL = os.environ.get("NARRATOR_QWEN_MODEL", "")  # empty: qwen_voice picks the preset or the cloning model
+QWEN_VOICES_DIR = os.environ.get("NARRATOR_QWEN_VOICES_DIR", os.path.join(HOME, ".narrator", "voices"))
 CACHE_MAX_BYTES = 50 * 1024 * 1024
 SILENT = os.environ.get("NARRATOR_SIDECAR_SILENT") == "1"
 
@@ -101,12 +104,14 @@ def main() -> None:
     if TTS == "qwen":
         import numpy as np
         from mlx_audio.tts.utils import load_model
+        from qwen_voice import resolve
 
-        qwen = load_model(QWEN_MODEL)
+        choice = resolve(QWEN_VOICE, QWEN_VOICES_DIR, QWEN_MODEL)
+        qwen = load_model(choice["model"])
 
         def synth(text):
             chunks, sr = [], 24000
-            for r in qwen.generate(text=text, voice=QWEN_VOICE, lang_code="english"):
+            for r in qwen.generate(text=text, lang_code="english", **choice["kwargs"]):
                 chunks.append(np.array(r.audio, dtype="float32"))
                 sr = r.sample_rate
             return np.concatenate(chunks), sr
