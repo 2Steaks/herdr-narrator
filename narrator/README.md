@@ -139,6 +139,7 @@ The text of an agent's latest reply is sent to the summary provider you choose. 
 Start with `sh narrator/doctor.sh`. It checks the process and voice sidecar, whether the socket answers and the Narrator reads it (the cause of most dead controls), mute, the voice, the Herdr app, the overlay and hooks, and the last 15 minutes of the log (`--minutes N` to change that). It prints counts and error names only, and ends with what to do about each problem. Then `sh narrator/restart.sh` stops everything cleanly (quit command, then signals, then leftover sidecars and a stale socket) and starts it the way Herdr does; `--dry-run` shows what it would do. Run it from a Herdr pane unless `NARRATOR_BACKEND=herdr-app` is set.
 
 - **Nothing is said.** Read `~/.narrator/narrator.log`. Look for `summary provider` at startup (a missing key is reported there) and `summary failed` lines.
+- **Silent, with `summary failed` and `err":"Error"` in the log (Bedrock).** The AWS SDK is loaded on first use, so a damaged `narrator/node_modules` (for example empty `@aws-sdk` folders) only shows up as a plain `Error`. Run `cd narrator && npm install`, then `sh narrator/restart.sh`. `doctor.sh` does not check for this yet, so it can report "ok" while nothing is spoken.
 - **It is not running.** `sh narrator/plugin/start.sh`. It does nothing when it is already running.
 - **No sound or the wrong device.** It switches device at the start of each line. Check the macOS output device.
 - **Lines repeat or never repeat.** A line plays once per pane revision. Use replay to hear it again.
