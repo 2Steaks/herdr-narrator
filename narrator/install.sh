@@ -3,7 +3,8 @@
 #
 #   sh narrator/install.sh [--qwen] [--bedrock] [--yes | --no-integrate] [--dry-run]
 #
-#   --qwen          also install mlx-audio so NARRATOR_TTS=qwen works (Apple Silicon only; the model downloads on first use)
+#   --qwen          also install mlx-audio so NARRATOR_TTS=qwen works (Apple Silicon only; the model downloads on first use).
+#                   Cloned voices are added afterwards with add-voice.sh.
 #   --bedrock       also install the AWS SDK so NARRATOR_LLM=bedrock works (skipped by default)
 #   --yes           wire the Narrator into Herdr and Claude Code without asking
 #   --no-integrate  do not touch Herdr or Claude Code settings; print the steps instead
@@ -22,7 +23,7 @@ for arg in "$@"; do
     --yes) YES=1 ;;
     --no-integrate) NOINT=1 ;;
     --dry-run) DRY=1 ;;
-    -h|--help) sed -n '2,14p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h|--help) sed -n '2,15p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "unknown option: $arg (try --help)" >&2; exit 2 ;;
   esac
 done
