@@ -109,6 +109,10 @@ If a login or key stops working (HTTP 401 or 403), the Narrator says so once and
 
 Kokoro is the default: small, fast, and good. Qwen3-TTS (`--qwen`) sounds more natural but renders a full sentence in roughly twice the time, which only matters for lines that cannot be rendered ahead of time. Qwen presets: serena, vivian, uncle_fu, ryan, aiden, ono_anna, sohee, eric, dylan. The Narrator follows your default output device, so switching to headphones mid-session works from the next line.
 
+#### Switching voices
+
+`sh narrator/pick-voice.sh` shows a menu of every voice (Qwen presets, your cloned voices, the Kokoro voices; the current one is marked), writes your pick to `~/.narrator/config.env` (`NARRATOR_TTS` plus `NARRATOR_VOICE` or `NARRATOR_QWEN_VOICE`) and runs `restart.sh`. It uses `fzf` when installed and a numbered prompt otherwise. `sh narrator/pick-voice.sh rick` skips the menu, `--list` prints the voices, `--no-restart` and `--dry-run` do what they say.
+
 #### Custom voices
 
 Qwen3-TTS can clone a voice from a short recording. Record 5 to 10 seconds of one person talking, no music, and write down exactly what they say. Then:
@@ -129,6 +133,18 @@ That converts the clip to 24 kHz mono, stores it in `~/.narrator/voices/ben/` (`
 | `narrator.restart` | Stop it completely and start it again (runs `restart.sh`; not bound to a key by the installer). Also on `x` in the app overlay, where `d` runs `doctor.sh` and shows the result as a toast |
 
 Run them from the keys the installer added (`prefix+a`, `prefix+m`, `prefix+u`, `prefix+y`), from the app overlay, or with `herdr plugin action invoke narrator.replay`.
+
+The app overlay opens with `cmd-shift-n` (the installer binds it; add `"cmd-shift-n": "mod.open:narrator"` under `global` in `~/.config/herdr-app/keys.json` to do it yourself).
+
+Scripts, run from the repo with `sh narrator/<name>`:
+
+| Script | What it does |
+| --- | --- |
+| `pick-voice.sh [voice]` | Menu of voices; writes the pick to `config.env` and restarts. `--list`, `--no-restart`, `--dry-run` |
+| `add-voice.sh <name> <audio> "<transcript>"` | Clone a voice from a short recording (`--use` selects it) |
+| `restart.sh` | Stop the Narrator completely and start it again (`--dry-run`) |
+| `doctor.sh` | Check the process, voice, socket, overlay, hooks and recent log (`--minutes N`) |
+| `install.sh` | Set up the voice and wire the Narrator into Herdr and Claude Code |
 
 ## Privacy
 
