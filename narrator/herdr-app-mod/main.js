@@ -33,6 +33,7 @@ const ACTIONS = [
 export default class NarratorMod extends View {
   init(_props, cx) {
     this.muted = null;
+    this.busy = null;
     this.focus = cx.focus_handle();
     this.focus.focus();
     cx.spawn(async (cx) => {
@@ -45,13 +46,25 @@ export default class NarratorMod extends View {
   }
 
   act(a, cx) {
-    closeOverlay(props().overlay);
-    cx.spawn(async () => {
+    if (this.busy) return;
+    const overlay = props().overlay;
+    let closed = false;
+    const close = () => { if (!closed) { closed = true; closeOverlay(overlay); } };
+    // Closing the overlay cancels its tasks, so the command must start before it closes. Quick actions close once
+    // the command is running; report actions stay open (showing their status) until their toast has been posted.
+    cx.spawn(async (cx) => {
       try {
         const dir = await pluginDir();
         if (!dir) return;
         const script = `${dir}/${a.script}`;
-        if (!a.report) { await exec("sh", [script, ...a.args]); return; }
+        if (!a.report) {
+          const run = exec("sh", [script, ...a.args]);
+          close();
+          await run;
+          return;
+        }
+        this.busy = a.report.working;
+        cx.notify();
         notify({ title: a.report.title, body: a.report.working, level: "info" });
         // tee keeps the whole output in a file next to config.env while the toast gets a summary of it
         const r = a.tee
@@ -60,6 +73,8 @@ export default class NarratorMod extends View {
         notify({ title: a.report.title, ...a.report.result(r) });
       } catch (e) {
         if (a.report) notify({ title: a.report.title, body: String(e?.message ?? e).slice(0, 200), level: "error" });
+      } finally {
+        close();
       }
     });
   }
@@ -73,7 +88,7 @@ export default class NarratorMod extends View {
       })
       .child(h_flex().justify_between().text_size(12).text_color(t.muted)
         .child("Narrator")
-        .child(this.muted === null ? "" : this.muted ? "muted" : "speaking"))
+        .child(this.busy ?? (this.muted === null ? "" : this.muted ? "muted" : "speaking")))
       .children(ACTIONS.map((a) =>
         h_flex().id(`g-${a.key}`).px(8).py(6).rounded(6).justify_between().text_size(13).text_color(t.foreground)
           .hover((s) => s.bg(t.hover))
