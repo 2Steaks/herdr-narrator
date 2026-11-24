@@ -40,6 +40,19 @@ Restart Herdr and any open Claude Code sessions, then start the Narrator with `s
 
 If you told the installer not to edit your settings, the four manual steps are in [`narrator/README.md`](narrator/README.md#wiring-it-in-by-hand).
 
+## Using it
+
+In the Herdr app, press `cmd-shift-n` to open the Narrator menu: replay the last line, mute, start, quit, restart, or run the doctor. The installer binds the key. To do it yourself, add `"cmd-shift-n": "mod.open:narrator"` under `global` in `~/.config/herdr-app/keys.json`.
+
+Change or add a voice from the repo folder:
+
+```sh
+sh narrator/pick-voice.sh        # menu of every voice; saves your pick and restarts the Narrator
+sh narrator/add-voice.sh ben ~/Desktop/ben.m4a "The exact words in the recording." --use   # clone a voice (needs --qwen)
+```
+
+`pick-voice.sh` lists the Kokoro voices, the Qwen presets and any voice you cloned. `add-voice.sh` takes 5 to 10 seconds of one person talking and a word-for-word transcript. If something sounds wrong, run `sh narrator/doctor.sh`; `sh narrator/restart.sh` restarts the Narrator. All the scripts and their flags are in [`narrator/README.md`](narrator/README.md#using-it).
+
 ## Learn more
 
 Settings, voices, privacy and troubleshooting are in [`narrator/README.md`](narrator/README.md).
